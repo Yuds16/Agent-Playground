@@ -13,7 +13,6 @@ This repository contains multiple AI agents that demonstrate different capabilit
 
 - Python 3.10+
 - Google Cloud account (for Vertex AI) or Google API key
-- Telegram Bot Token (for Telegram agent)
 
 ## Setup
 
@@ -37,7 +36,6 @@ This repository contains multiple AI agents that demonstrate different capabilit
 4. **Configure environment variables**
    - Copy and configure `.env` files in each agent directory
    - Set your Google API key or Vertex AI credentials
-   - Add Telegram bot token for the Telegram agent
 
 ## Agents
 
