@@ -66,13 +66,7 @@ Each agent has its own `.env` file for configuration:
 ```env
 GOOGLE_GENAI_USE_VERTEXAI=0  # Use 0 for API key, 1 for Vertex AI
 GOOGLE_API_KEY=your_api_key_here
-TELEGRAM_BOT_TOKEN=your_telegram_token_here  # For Telegram agent only
 ```
-
-## Dependencies
-
-- `google-adk` - Google Agent Development Kit
-- `python-telegram-bot` - Telegram Bot API wrapper
 
 ## Usage
 
@@ -82,6 +76,13 @@ adk run <agent_directory>
 ```
 
 Type `exit` to stop the agent.
+
+Run on the web interface:
+```bash
+adk web
+```
+
+Pick agent from the list and interact via web UI.
 
 ## License
 
