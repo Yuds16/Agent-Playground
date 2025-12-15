@@ -8,7 +8,6 @@ This repository contains multiple AI agents that demonstrate different capabilit
 
 - **Basic Agent** - Simple Q&A assistant
 - **Multi-tool Agent** - Agent with weather and time tools
-- **Telegram Agent** - AI agent integrated with Telegram bot (WIP)
 
 ## Prerequisites
 
@@ -58,18 +57,6 @@ Agent with custom tools for weather and time queries.
 
 ```bash
 adk run multi_tool_agent
-```
-
-### Telegram Agent (`tele_agent/`)
-AI agent that can send and receive Telegram messages.
-
-**Features:**
-- Send messages to Telegram chats
-- Read incoming messages
-- Integrated with Google ADK
-
-```bash
-adk run tele_agent
 ```
 
 ## Configuration

@@ -1,2 +1,6 @@
 google-adk
 python-telegram-bot
+google
+diffusers
+torch
+transformers
