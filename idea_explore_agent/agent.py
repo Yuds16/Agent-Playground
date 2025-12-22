@@ -1,7 +1,8 @@
 from google.adk.agents.llm_agent import Agent
 from google import genai
-from diffusers import DiffusionPipeline
-import torch
+from google.genai import types
+from PIL import Image
+from io import BytesIO
 
 import os
 import dotenv
@@ -43,39 +44,52 @@ def create_new_markdown(name: str, content: str):
     
     return ToolResponse(True, f'{name}.md created successfully')
 
-def generate_image(prompt: str):
-    client = genai.Client(
-        api_key=os.getenv('GOOGLE_API_KEY', '')
-    )
+def generate_image(prompt: str, output_filename: str) -> str:
+    """
+    Generates an image using the 'Nano Banana Pro' (Gemini 3 Pro Image) model.
+    
+    Args:
+        prompt: The description of the image to generate.
+        output_filename: Where to save the resulting image.
+        
+    Returns:
+        str: A status message confirming the file path.
+    """
+    print(f"🎨 Generating image for: '{prompt}'...")
+    
+    client = genai.Client(api_key=os.environ["GOOGLE_API_KEY"])
 
-    prompt = f"Generate an image of the following prompt: {prompt}. Return only the image."
-
-    response = client.models.generate_content(
-        model="gemini-2.5-flash-image",
-        contents=[prompt]
-    )
-
-    for part in response.parts:
-        if part.text is not None:
-            print(part.text)
-        elif part.inline_data is not None:
-            image = part.as_image()
-            image.save("idea_explore_agent/outputs/generated_image.png")
-
-    return response
-
-def generate_image_stablediffuse(prompt: str):
     try:
-        pipe = DiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-3.5-large-tensorrt", torch_dtype=torch.float16, use_safetensors=True, variant="fp16")
+        # 'gemini-3-pro-image-preview' is the ID for Nano Banana Pro
+        response = client.models.generate_content(
+            model="gemini-3-pro-preview",
+            # model="imagen-3.0-generate-001",
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                # 1. Tell the model to output an IMAGE
+                response_modalities=["IMAGE"],
+                
+                # 2. Configure image specifics (Aspect Ratio, etc.)
+                # This is where Nano Banana accepts image settings
+                image_config=types.ImageConfig(
+                    
+                )
+            )
+        )
+        
+        if response.candidates and response.candidates[0].content.parts:
+            for part in response.candidates[0].content.parts:
+                if part.inline_data:
+                    # Found the image data!
+                    image_bytes = part.inline_data.data
+                    img = Image.open(BytesIO(image_bytes))
+                    img.save(output_filename)
+                    return ToolResponse(True, f"Image saved to {output_filename}")
+        else:
+            return ToolResponse(False, "No image data received from model")
 
-        image = pipe(prompt=prompt).images[0]
-        image.save("idea_explore_agent/outputs/generated_image.png")
     except Exception as e:
         return ToolResponse(False, str(e))
-    
-    return ToolResponse(True, "Image generated successfully")
-    
-    return image
 
 # root_agent = Agent(
 #     model='gemini-2.5-flash',
@@ -92,4 +106,4 @@ def generate_image_stablediffuse(prompt: str):
 # )
 
 if __name__ == '__main__':
-    print(generate_image_stablediffuse('a cat'))
+    print(generate_image('a cat', 'idea_explore_agent/outputs/generated_image.png'))
