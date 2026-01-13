@@ -50,30 +50,25 @@ def generate_image(prompt: str, output_filename: str) -> str:
     
     Args:
         prompt: The description of the image to generate.
-        output_filename: Where to save the resulting image.
+        output_filename: The path where to save the resulting image.
         
     Returns:
         str: A status message confirming the file path.
     """
     print(f"🎨 Generating image for: '{prompt}'...")
     
+    # Ensure directory exists for output_filename
+    os.makedirs(os.path.dirname(output_filename), exist_ok=True)
+    
     client = genai.Client(api_key=os.environ["GOOGLE_API_KEY"])
 
     try:
-        # 'gemini-3-pro-image-preview' is the ID for Nano Banana Pro
         response = client.models.generate_content(
-            model="gemini-3-pro-preview",
-            # model="imagen-3.0-generate-001",
+            model="gemini-2.0-flash-exp", 
             contents=prompt,
             config=types.GenerateContentConfig(
-                # 1. Tell the model to output an IMAGE
                 response_modalities=["IMAGE"],
-                
-                # 2. Configure image specifics (Aspect Ratio, etc.)
-                # This is where Nano Banana accepts image settings
-                image_config=types.ImageConfig(
-                    
-                )
+                image_config=types.ImageConfig()
             )
         )
         
@@ -91,19 +86,21 @@ def generate_image(prompt: str, output_filename: str) -> str:
     except Exception as e:
         return ToolResponse(False, str(e))
 
-# root_agent = Agent(
-#     model='gemini-2.5-flash',
-#     name='root_agent',
-#     description='A helpful assistant to help you explore new ideas and generate new content',
-#     instruction='''
-#     Support the user in exploring new ideas and generating new content
-#     Answer user questions to the best of your knowledge
+root_agent = Agent(
+    model='gemini-2.0-flash-exp',
+    name='root_agent',
+    description='A helpful assistant to help you explore new ideas and generate new content',
+    instruction='''
+    Support the user in exploring new ideas and generating new content
+    Answer user questions to the best of your knowledge
     
-#     You can use the following tools:
-#     - `create_new_markdown`: Create a new markdown file
-#     ''',
-#     tools=[create_new_markdown],
-# )
+    You can use the following tools:
+    - `create_new_markdown`: Create a new markdown file
+    - `generate_image`: Generate an image based on a prompt
+    ''',
+    tools=[create_new_markdown, generate_image],
+)
 
 if __name__ == '__main__':
-    print(generate_image('a cat', 'idea_explore_agent/outputs/generated_image.png'))
+    # print(generate_image('a cat', 'idea_explore_agent/outputs/generated_image.png'))
+    pass
